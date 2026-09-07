@@ -8,10 +8,7 @@ import {
   CheckCircle, 
   XCircle, 
   Trash2, 
-  AlertTriangle,
-  Briefcase,
-  ExternalLink,
-  Filter
+  AlertTriangle
 } from 'lucide-react';
 
 interface StudentData {

@@ -2,12 +2,9 @@ import React from 'react';
 import { 
   ShieldCheck, 
   ArrowRight, 
-  Zap, 
   Building2, 
   GraduationCap, 
-  Briefcase, 
-  CheckCircle2, 
-  Sparkles 
+  CheckCircle2
 } from 'lucide-react';
 import type { PageType, User } from '../types';
 

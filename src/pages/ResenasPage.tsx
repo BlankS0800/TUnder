@@ -104,7 +104,7 @@ export const ResenasPage: React.FC<ResenasPageProps> = ({ currentUser, setActive
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       {/* Cabecera */}
       <div className="max-w-3xl space-y-2">
-        <h1 className="text-3xl font-black text-tunder-navy">Reseñas y Experiencias del Ecosistema</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-tunder-navy">Reseñas y Experiencias del Ecosistema</h1>
         <p className="text-slate-600 text-sm">
           Conoce las valoraciones dejadas por estudiantes, empresas colaboradoras y las autoridades universitarias.
         </p>

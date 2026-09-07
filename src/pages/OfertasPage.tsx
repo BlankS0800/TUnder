@@ -66,9 +66,9 @@ export const OfertasPage: React.FC<OfertasPageProps> = ({ currentUser, setActive
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 space-y-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-extrabold text-tunder-navy">Convocatorias de Pasantías Activas</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-tunder-navy">Convocatorias de Pasantías Activas</h1>
         <p className="text-slate-600 mt-1">Oportunidades validadas por las unidades académicas en La Paz.</p>
       </div>
 

@@ -122,10 +122,10 @@ export const UniversidadPage: React.FC = () => {
 
       {/* Navegación de Pestañas y Búsqueda */}
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 border-b border-slate-200 pb-4">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => { setActiveTab('estudiantes'); setSearch(''); }}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition ${
+            className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition ${
               activeTab === 'estudiantes'
                 ? 'bg-tunder-navy text-white shadow-md'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
@@ -137,7 +137,7 @@ export const UniversidadPage: React.FC = () => {
 
           <button
             onClick={() => { setActiveTab('empresas'); setSearch(''); }}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition ${
+            className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition ${
               activeTab === 'empresas'
                 ? 'bg-tunder-navy text-white shadow-md'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'

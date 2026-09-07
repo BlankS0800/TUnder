@@ -55,7 +55,7 @@ export const App: React.FC = () => {
         currentUser={currentUser}
         onLogout={handleLogout}
       />
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         {renderPage()}
       </main>
       <Footer />

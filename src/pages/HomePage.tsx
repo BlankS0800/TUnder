@@ -26,7 +26,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setPage, currentUser }) => {
             </div>*/}
            
 
-            <h1 className="text-4xl sm:text-6xl font-black text-tunder-navy tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-6xl font-black text-tunder-navy tracking-tight leading-tight">
               Conectamos el talento universitario con las mejores <span className="text-transparent bg-clip-text bg-gradient-to-r from-tunder-cyan to-tunder-orange">empresas del país</span>
             </h1>
 
@@ -34,10 +34,10 @@ export const HomePage: React.FC<HomePageProps> = ({ setPage, currentUser }) => {
               La plataforma oficial donde las empresas publican convocatorias exclusivas y los estudiantes acceden a pasantías con respaldo académico formal.
             </p>
             
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-2">
               <button 
                 onClick={() => setPage('ofertas')} 
-                className="px-7 py-3.5 rounded-xl bg-tunder-orange text-white font-bold hover:bg-orange-600 transition flex items-center gap-2 shadow-xl shadow-orange-500/25 text-sm"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-tunder-orange text-white font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2 shadow-xl shadow-orange-500/25 text-sm"
               >
                 Explorar Convocatorias <ArrowRight className="w-4 h-4" />
               </button>
@@ -45,14 +45,14 @@ export const HomePage: React.FC<HomePageProps> = ({ setPage, currentUser }) => {
               {!currentUser ? (
                 <button 
                   onClick={() => setPage('register')} 
-                  className="px-7 py-3.5 rounded-xl bg-white border border-slate-300 text-tunder-navy font-bold hover:bg-slate-50 transition text-sm shadow-sm"
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white border border-slate-300 text-tunder-navy font-bold hover:bg-slate-50 transition text-sm shadow-sm"
                 >
                   Registrarse en la Plataforma
                 </button>
               ) : (
                 <button 
                   onClick={() => setPage(currentUser.rol === 'universidad' ? 'universidad' : currentUser.rol === 'empresa' ? 'empresas' : 'estudiantes')} 
-                  className="px-7 py-3.5 rounded-xl bg-tunder-blue text-white font-bold hover:bg-tunder-navy transition flex items-center gap-2 shadow-lg text-sm"
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-tunder-blue text-white font-bold hover:bg-tunder-navy transition flex items-center justify-center gap-2 shadow-lg text-sm"
                 >
                   Ir a mi Panel ({currentUser.rol}) <ArrowRight className="w-4 h-4" />
                 </button>
@@ -61,7 +61,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setPage, currentUser }) => {
           </div>
 
           {/* Estadísticas de Impacto */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
+          <div className="mt-12 sm:mt-16 grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 max-w-5xl mx-auto bg-white p-3 sm:p-6 rounded-2xl shadow-xl border border-slate-100">
             <div className="text-center p-3 border-r border-slate-100 last:border-0">
               <div className="text-2xl sm:text-3xl font-black text-tunder-navy">100%</div>
               <div className="text-xs text-slate-500 font-medium mt-1">Convocatorias Validadas</div>

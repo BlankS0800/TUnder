@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Zap, ArrowRight, GraduationCap, Building2 } from 'lucide-react';
+import { Zap, ArrowRight, GraduationCap, Building2, AlertCircle, Loader2 } from 'lucide-react';
 import type { PageType, User } from '../types';
+import { authService } from '../services/authService';
 
 interface RegisterPageProps {
   onRegisterSuccess: (user: User) => void;
@@ -13,18 +14,36 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess, s
   const [password, setPassword] = useState('');
   const [rol, setRol] = useState<'estudiante' | 'empresa'>('estudiante');
   const [carreraOSector, setCarreraOSector] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newUser: User = {
-      nombre,
-      email,
-      rol,
-      entidad: carreraOSector || (rol === 'estudiante' ? 'Carrera Universitaria' : 'Empresa Aliada')
-    };
-    onRegisterSuccess(newUser);
-    if (rol === 'estudiante') setActivePage('estudiantes');
-    else setActivePage('empresas');
+    setError(null);
+    setLoading(true);
+
+    try {
+      const { user, error: regError } = await authService.signUp({
+        email,
+        password,
+        nombre,
+        rol,
+        carreraOSector
+      });
+
+      if (regError || !user) {
+        setError(regError || 'No se pudo completar el registro. Verifica los datos.');
+        return;
+      }
+
+      onRegisterSuccess(user);
+      if (rol === 'estudiante') setActivePage('estudiantes');
+      else setActivePage('empresas');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error inesperado durante el registro');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,6 +58,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess, s
         </div>
 
         <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm space-y-5">
+          {error && (
+            <div className="flex items-center gap-2 p-3 text-xs bg-red-50 text-red-700 border border-red-200 rounded-lg">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Tipo de Registro</label>
@@ -113,18 +139,28 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess, s
               <input
                 type="password"
                 required
+                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Mínimo 6 caracteres"
                 className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-tunder-cyan"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-2.5 bg-tunder-navy hover:bg-slate-900 text-white text-sm font-bold rounded-lg transition flex items-center justify-center gap-2 shadow-md shadow-blue-950/10"
+              disabled={loading}
+              className="w-full py-2.5 bg-tunder-navy hover:bg-slate-900 disabled:opacity-70 text-white text-sm font-bold rounded-lg transition flex items-center justify-center gap-2 shadow-md shadow-blue-950/10"
             >
-              Completar Registro <ArrowRight className="w-4 h-4 text-tunder-orange" />
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-tunder-orange" /> Creando cuenta...
+                </>
+              ) : (
+                <>
+                  Completar Registro <ArrowRight className="w-4 h-4 text-tunder-orange" />
+                </>
+              )}
             </button>
           </form>
 

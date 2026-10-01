@@ -1,67 +1,41 @@
 import React, { useState } from 'react';
-import { Zap, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
+import { Zap, Lock, Mail, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import type { PageType, User } from '../types';
+import { authService, DEMO_ACCOUNTS } from '../services/authService';
 
 interface LoginPageProps {
   onLoginSuccess: (user: User) => void;
   setActivePage: (page: PageType) => void;
 }
 
-// Credenciales por defecto del ecosistema
-const DEFAULT_ACCOUNTS = [
-  {
-    email: 'estudiante@gmail.com',
-    password: '123',
-    user: {
-      email: 'estudiante@gmail.com',
-      nombre: 'Mikaela Mendoza',
-      rol: 'estudiante' as const,
-      entidad: 'UMSA'
-    }
-  },
-  {
-    email: 'empresa@gmail.com',
-    password: '123',
-    user: {
-      email: 'empresa@gmail.com',
-      nombre: 'Tech S.R.L.',
-      rol: 'empresa' as const,
-      entidad: 'Sector Tecnológico La Paz'
-    }
-  },
-  {
-    email: 'convenios@gmail.com',
-    password: '123',
-    user: {
-      email: 'convenios@gmail.com',
-      nombre: 'Dirección de Carrera',
-      rol: 'universidad' as const,
-      entidad: 'UMSA'
-    }
-  }
-];
-
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, setActivePage }) => {
   const [email, setEmail] = useState<string>('estudiante@gmail.com');
   const [password, setPassword] = useState<string>('123');
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
-    const match = DEFAULT_ACCOUNTS.find(
-      acc => acc.email.toLowerCase() === email.trim().toLowerCase() && acc.password === password
-    );
+    try {
+      const { user, error: authError } = await authService.signIn(email, password);
 
-    if (match) {
-      onLoginSuccess(match.user);
-      // Redirige según el rol autenticado
-      if (match.user.rol === 'estudiante') setActivePage('estudiantes');
-      else if (match.user.rol === 'empresa') setActivePage('empresas');
+      if (authError || !user) {
+        setError(authError || 'Credenciales inválidas. Por favor intenta nuevamente.');
+        return;
+      }
+
+      onLoginSuccess(user);
+      // Redirigir según el rol
+      if (user.rol === 'estudiante') setActivePage('estudiantes');
+      else if (user.rol === 'empresa') setActivePage('empresas');
       else setActivePage('universidad');
-    } else {
-      setError('Credenciales inválidas. Usa una de las cuentas de prueba disponibles.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error inesperado al iniciar sesión');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -125,19 +99,28 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, setActiveP
 
             <button
               type="submit"
-              className="w-full py-2.5 bg-tunder-orange hover:bg-orange-600 text-white text-sm font-bold rounded-lg transition shadow-md shadow-orange-500/20 flex items-center justify-center gap-2"
+              disabled={loading}
+              className="w-full py-2.5 bg-tunder-orange hover:bg-orange-600 disabled:opacity-70 text-white text-sm font-bold rounded-lg transition shadow-md shadow-orange-500/20 flex items-center justify-center gap-2"
             >
-              Iniciar Sesión <ArrowRight className="w-4 h-4" />
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Conectando...
+                </>
+              ) : (
+                <>
+                  Iniciar Sesión <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
 
-          {/* Cuentas por defecto para pruebas */}
+          {/* Accesos de Prueba */}
           <div className="pt-4 border-t border-slate-100">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
               Accesos de Prueba (Click para autocompletar):
             </span>
             <div className="space-y-1.5">
-              {DEFAULT_ACCOUNTS.map((acc) => (
+              {DEMO_ACCOUNTS.map((acc) => (
                 <button
                   key={acc.email}
                   type="button"
@@ -157,6 +140,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, setActiveP
             </div>
           </div>
         </div>
+
+        <p className="text-center text-xs text-slate-500">
+          ¿No tienes una cuenta aún?{' '}
+          <button onClick={() => setActivePage('register')} className="text-tunder-cyan font-bold hover:underline">
+            Regístrate aquí
+          </button>
+        </p>
       </div>
     </div>
   );

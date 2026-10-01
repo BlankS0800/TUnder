@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Star, 
   MessageSquarePlus, 
@@ -7,9 +7,11 @@ import {
   ShieldCheck, 
   CheckCircle2, 
   Lock, 
-  Filter 
+  Filter,
+  Loader2
 } from 'lucide-react';
 import type { Review, User, PageType, UserRole } from '../types';
+import { reviewsService } from '../services/reviewsService';
 
 interface ResenasPageProps {
   currentUser: User | null;
@@ -17,65 +19,56 @@ interface ResenasPageProps {
 }
 
 export const ResenasPage: React.FC<ResenasPageProps> = ({ currentUser, setActivePage }) => {
-  const [reviews, setReviews] = useState<Review[]>([
-    {
-      id: 'rev-1',
-      autor: 'Mikaela Mendoza',
-      rol: 'estudiante',
-      entidad: 'Informática - UMSA',
-      calificacion: 5,
-      comentario: 'La plataforma me permitió conseguir una pasantía formal que se acomoda perfectamente a mis horarios de clases del 8vo semestre. Muy recomendada.',
-      fecha: 'Hace 3 días'
-    },
-    {
-      id: 'rev-2',
-      autor: 'TechAndes S.R.L.',
-      rol: 'empresa',
-      entidad: 'Sector Tecnológico La Paz',
-      calificacion: 5,
-      comentario: 'Encontramos rápidamente pasantes con conocimientos reales en React y Node.js. El filtro por materias aprobadas ahorra semanas de reclutamiento.',
-      fecha: 'Hace 1 semana'
-    },
-    {
-      id: 'rev-3',
-      autor: 'Dirección de Carrera',
-      rol: 'universidad',
-      entidad: 'Universidad',
-      calificacion: 5,
-      comentario: 'Excelente herramienta institucional para supervisar convenios y garantizar que los estudiantes realicen prácticas seguras y convalidables.',
-      fecha: 'Hace 2 semanas'
-    }
-  ]);
-
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [selectedFilter, setSelectedFilter] = useState<'todos' | UserRole>('todos');
   const [calificacion, setCalificacion] = useState<number>(5);
   const [comentario, setComentario] = useState<string>('');
   const [successToast, setSuccessToast] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  useEffect(() => {
+    loadReviews();
+  }, [selectedFilter]);
+
+  const loadReviews = async () => {
+    try {
+      setLoading(true);
+      const data = await reviewsService.getReviews(selectedFilter);
+      setReviews(data);
+    } catch (err) {
+      console.error('Error cargando reseñas:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser || !comentario.trim()) return;
 
-    const newReview: Review = {
-      id: `rev-${Date.now()}`,
-      autor: currentUser.nombre,
-      rol: currentUser.rol,
-      entidad: currentUser.entidad,
-      calificacion,
-      comentario: comentario.trim(),
-      fecha: 'Justo ahora'
-    };
+    setIsSubmitting(true);
+    try {
+      const created = await reviewsService.createReview({
+        user_id: currentUser.id,
+        autor: currentUser.nombre,
+        rol: currentUser.rol,
+        entidad: currentUser.entidad || (currentUser.rol === 'estudiante' ? 'Estudiante UMSA' : 'Entidad Aliada'),
+        calificacion,
+        comentario: comentario.trim()
+      });
 
-    setReviews([newReview, ...reviews]);
-    setComentario('');
-    setCalificacion(5);
-    setSuccessToast(true);
-    setTimeout(() => setSuccessToast(false), 3000);
+      setReviews([created, ...reviews]);
+      setComentario('');
+      setCalificacion(5);
+      setSuccessToast(true);
+      setTimeout(() => setSuccessToast(false), 3500);
+    } catch (err) {
+      console.error('Error guardando reseña:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-  const filteredReviews = selectedFilter === 'todos' 
-    ? reviews 
-    : reviews.filter((r) => r.rol === selectedFilter);
 
   const getRoleBadge = (rol: UserRole) => {
     switch (rol) {
@@ -93,7 +86,7 @@ export const ResenasPage: React.FC<ResenasPageProps> = ({ currentUser, setActive
         );
       case 'universidad':
         return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-navy-800 bg-slate-100 text-tunder-navy px-2.5 py-0.5 rounded-full border border-slate-300">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-800 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-300">
             <ShieldCheck className="w-3.5 h-3.5 text-tunder-orange" /> Universidad
           </span>
         );
@@ -104,9 +97,9 @@ export const ResenasPage: React.FC<ResenasPageProps> = ({ currentUser, setActive
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       {/* Cabecera */}
       <div className="max-w-3xl space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-black text-tunder-navy">Reseñas y Experiencias del Ecosistema</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-tunder-navy">Reseñas y Experiencias de la Comunidad</h1>
         <p className="text-slate-600 text-sm">
-          Conoce las valoraciones dejadas por estudiantes, empresas colaboradoras y las autoridades universitarias.
+          Conoce los testimonios reales de estudiantes, empresas contratantes y directores de carrera en TUnder.
         </p>
       </div>
 
@@ -118,9 +111,9 @@ export const ResenasPage: React.FC<ResenasPageProps> = ({ currentUser, setActive
         </div>
 
         {successToast && (
-          <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2">
+          <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2 animate-fade-in">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            ¡Tu reseña ha sido publicada con éxito!
+            ¡Tu reseña ha sido guardada en Supabase y ya es visible para toda la comunidad!
           </div>
         )}
 
@@ -138,13 +131,13 @@ export const ResenasPage: React.FC<ResenasPageProps> = ({ currentUser, setActive
             {/* Selector de Estrellas */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Calificación general:</label>
-              <div className="flex items-center gap-1.5">
+              <div className="flex gap-1.5 items-center">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     onClick={() => setCalificacion(star)}
-                    className="p-1 text-amber-400 hover:scale-110 transition"
+                    className="p-1 hover:scale-110 transition-transform focus:outline-hidden"
                   >
                     <Star
                       className={`w-6 h-6 ${
@@ -162,105 +155,110 @@ export const ResenasPage: React.FC<ResenasPageProps> = ({ currentUser, setActive
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Tu Comentario / Experiencia</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Tu Experiencia u Opinión:</label>
               <textarea
-                rows={3}
                 required
+                rows={3}
                 value={comentario}
                 onChange={(e) => setComentario(e.target.value)}
-                placeholder="Cuéntanos cómo fue tu experiencia usando la plataforma..."
+                placeholder="Escribe cómo fue tu experiencia gestionando o realizando tu pasantía a través de TUnder..."
                 className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-tunder-cyan"
               />
             </div>
 
-            <button
-              type="submit"
-              className="px-6 py-2.5 bg-tunder-orange hover:bg-orange-600 text-white font-bold rounded-xl text-xs transition shadow-md shadow-orange-500/20"
-            >
-              Publicar Reseña
-            </button>
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-6 py-2.5 bg-tunder-orange hover:bg-orange-600 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition shadow-md shadow-orange-500/20 flex items-center gap-2"
+              >
+                {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                Publicar Reseña
+              </button>
+            </div>
           </form>
         ) : (
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-3">
-            <Lock className="w-8 h-8 text-tunder-orange mx-auto" />
-            <p className="text-xs text-slate-600 max-w-md mx-auto">
-              Debes iniciar sesión con tu cuenta de Estudiante, Empresa o Universidad para publicar una reseña verificada.
-            </p>
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-white rounded-xl text-tunder-orange border border-slate-200">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-tunder-navy">Inicia sesión para compartir tu experiencia</h4>
+                <p className="text-xs text-slate-500">Solo usuarios acreditados pueden publicar testimonios en la plataforma.</p>
+              </div>
+            </div>
             <button
               onClick={() => setActivePage('login')}
-              className="px-5 py-2 bg-tunder-navy hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition"
+              className="px-4 py-2 bg-tunder-navy hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition shrink-0 shadow-sm"
             >
-              Iniciar Sesión para Opinar
+              Iniciar Sesión
             </button>
           </div>
         )}
       </div>
 
-      {/* Filtro de Reseñas */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-slate-500" />
-          <span className="text-xs font-bold text-slate-700">Filtrar opiniones por actor:</span>
+      {/* Filtros de Reseñas */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-4">
+        <div className="flex items-center gap-2 text-slate-500 text-xs font-bold">
+          <Filter className="w-4 h-4 text-tunder-cyan" /> Filtrar por categoría:
         </div>
-
         <div className="flex flex-wrap gap-2">
-          {(['todos', 'estudiante', 'empresa', 'universidad'] as const).map((filter) => (
+          {(['todos', 'estudiante', 'empresa', 'universidad'] as const).map((filtro) => (
             <button
-              key={filter}
-              onClick={() => setSelectedFilter(filter)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition ${
-                selectedFilter === filter
+              key={filtro}
+              onClick={() => setSelectedFilter(filtro)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition capitalize ${
+                selectedFilter === filtro
                   ? 'bg-tunder-navy text-white shadow-xs'
                   : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >
-              {filter === 'todos' ? 'Todas las Reseñas' : filter}
+              {filtro === 'todos' ? 'Todas las Reseñas' : `${filtro}s`}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Lista de Reseñas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredReviews.map((rev) => (
-          <div
-            key={rev.id}
-            className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs hover:shadow-md transition flex flex-col justify-between space-y-4"
-          >
-            <div className="space-y-3">
-              <div className="flex justify-between items-start gap-2">
+      {/* Grid de Reseñas */}
+      {loading ? (
+        <div className="py-16 text-center">
+          <Loader2 className="w-8 h-8 text-tunder-cyan animate-spin mx-auto mb-2" />
+          <p className="text-xs text-slate-500 font-medium">Cargando testimonios de la comunidad...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reviews.map((rev) => (
+            <div
+              key={rev.id}
+              className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-4 hover:border-tunder-cyan transition"
+            >
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex text-amber-400">
+                    {Array.from({ length: rev.calificacion }).map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-amber-400" />
+                    ))}
+                  </div>
+                  <span className="text-[11px] text-slate-400">{rev.fecha}</span>
+                </div>
+
+                <p className="text-xs text-slate-700 italic leading-relaxed">
+                  "{rev.comentario}"
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{rev.autor}</h3>
+                  <h5 className="text-xs font-bold text-tunder-navy">{rev.autor}</h5>
                   <p className="text-[11px] text-slate-400">{rev.entidad}</p>
                 </div>
-                {getRoleBadge(rev.rol)}
+                <div>{getRoleBadge(rev.rol)}</div>
               </div>
-
-              {/* Estrellas */}
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`w-3.5 h-3.5 ${
-                      star <= rev.calificacion
-                        ? 'text-amber-400 fill-amber-400'
-                        : 'text-slate-200'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <p className="text-xs text-slate-600 leading-relaxed italic">
-                "{rev.comentario}"
-              </p>
             </div>
-
-            <div className="pt-3 border-t border-slate-100 text-[10px] text-slate-400 font-medium">
-              Publicado {rev.fecha}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -142,6 +142,17 @@ export const authService = {
       });
 
       if (error) {
+        if (error.message.toLowerCase().includes('rate limit')) {
+          // Intentar iniciar sesión por si el usuario ya existe (ej. fue creado con seed.sql)
+          const loginAttempt = await this.signIn(email, password);
+          if (loginAttempt.user) {
+            return loginAttempt;
+          }
+          return {
+            user: null,
+            error: "Límite de envío de correos alcanzado en Supabase (rate limit). Para solucionarlo de inmediato: en tu panel de Supabase ve a Authentication -> Providers -> Email y desactiva la opción 'Confirm email' (luego haz clic en Save). O inicia sesión directamente desde la pantalla de login con las cuentas demo."
+          };
+        }
         return { user: null, error: error.message };
       }
 
@@ -213,6 +224,12 @@ export const authService = {
       });
 
       if (error) {
+        if (error.message.toLowerCase().includes('email not confirmed')) {
+          return {
+            user: null,
+            error: "El correo aún no ha sido confirmado. En tu panel de Supabase ve a Authentication -> Providers -> Email y desactiva 'Confirm email' para permitir login inmediato sin confirmación."
+          };
+        }
         return { user: null, error: error.message };
       }
 

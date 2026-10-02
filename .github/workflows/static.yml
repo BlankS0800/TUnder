@@ -38,7 +38,7 @@ jobs:
       # 3. Compilar Vite con la API Key
       - name: Build project
         env:
-          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
 
       # 4. Configurar y desplegar en GitHub Pages

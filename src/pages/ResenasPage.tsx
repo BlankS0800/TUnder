@@ -113,7 +113,7 @@ export const ResenasPage: React.FC<ResenasPageProps> = ({ currentUser, setActive
         {successToast && (
           <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2 animate-fade-in">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            ¡Tu reseña ha sido guardada en Supabase y ya es visible para toda la comunidad!
+            ¡Tu reseña ha sido publicada con éxito y ya es visible para toda la comunidad!
           </div>
         )}
 

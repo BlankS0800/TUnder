@@ -105,7 +105,7 @@ export const UniversidadPage: React.FC = () => {
           </div>
           <h1 className="text-2xl sm:text-4xl font-black tracking-tight">Panel de Control Universitario</h1>
           <p className="text-slate-300 text-xs sm:text-sm">
-            Fiscalización institucional de convenios, validación de pasantías y auditoría en tiempo real en Supabase.
+            Fiscalización institucional de convenios, validación de pasantías y auditoría en tiempo real.
           </p>
         </div>
 
@@ -208,7 +208,7 @@ export const UniversidadPage: React.FC = () => {
       {loading ? (
         <div className="py-16 text-center">
           <Loader2 className="w-8 h-8 text-tunder-cyan animate-spin mx-auto mb-2" />
-          <p className="text-xs text-slate-500 font-medium">Sincronizando padrón institucional desde Supabase...</p>
+          <p className="text-xs text-slate-500 font-medium">Sincronizando padrón institucional...</p>
         </div>
       ) : (
         <>

@@ -124,7 +124,7 @@ export const OfertasPage: React.FC<OfertasPageProps> = ({ currentUser, setActive
       {loading ? (
         <div className="py-16 flex flex-col items-center justify-center gap-2">
           <Loader2 className="w-8 h-8 text-tunder-cyan animate-spin" />
-          <p className="text-xs text-slate-500 font-medium">Sincronizando convocatorias desde la base de datos...</p>
+          <p className="text-xs text-slate-500 font-medium">Cargando convocatorias disponibles...</p>
         </div>
       ) : ofertas.length === 0 ? (
         <div className="py-16 text-center bg-white border border-slate-200 rounded-2xl p-8 space-y-2">

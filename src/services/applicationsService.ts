@@ -54,7 +54,7 @@ export const applicationsService = {
 
       return {
         success: true,
-        message: '¡Postulación registrada exitosamente en Supabase! La empresa revisará tus antecedentes.'
+        message: '¡Postulación enviada con éxito! La empresa revisará tus antecedentes.'
       };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al registrar la postulación';

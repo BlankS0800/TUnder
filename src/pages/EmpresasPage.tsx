@@ -169,7 +169,7 @@ export const EmpresasPage: React.FC<EmpresasPageProps> = ({ currentUser }) => {
       {successMsg && (
         <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs font-bold flex items-center gap-2 animate-fade-in">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          ¡Convocatoria publicada con éxito y sincronizada en Supabase!
+          ¡Convocatoria publicada con éxito!
         </div>
       )}
 

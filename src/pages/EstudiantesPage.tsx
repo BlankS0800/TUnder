@@ -186,7 +186,7 @@ export const EstudiantesPage: React.FC<EstudiantesPageProps> = ({ currentUser })
 
         {showSavedToast && (
           <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold animate-fade-in">
-            <CheckCircle className="w-4 h-4 text-emerald-600" /> ¡Perfil sincronizado en Supabase!
+            <CheckCircle className="w-4 h-4 text-emerald-600" /> ¡Perfil guardado correctamente!
           </div>
         )}
       </div>
@@ -366,7 +366,7 @@ export const EstudiantesPage: React.FC<EstudiantesPageProps> = ({ currentUser })
               <div>
                 <h2 className="text-lg font-bold text-tunder-navy">Actualizar Datos Académicos</h2>
                 <p className="text-xs text-slate-500">
-                  Esta información se sincroniza directamente con tu perfil en Supabase y será vista por los reclutadores.
+                  Esta información se sincroniza directamente con tu perfil y será vista por los reclutadores.
                 </p>
               </div>
 
@@ -508,7 +508,7 @@ export const EstudiantesPage: React.FC<EstudiantesPageProps> = ({ currentUser })
                   className="px-6 py-2.5 bg-tunder-navy hover:bg-slate-900 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition flex items-center gap-2 shadow-md shadow-blue-950/20"
                 >
                   <Save className="w-4 h-4 text-tunder-orange" />
-                  {saving ? 'Guardando en Supabase...' : 'Guardar Perfil'}
+                  {saving ? 'Guardando cambios...' : 'Guardar Perfil'}
                 </button>
               </div>
             </form>

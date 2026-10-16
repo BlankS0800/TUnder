@@ -150,7 +150,7 @@ export const authService = {
           }
           return {
             user: null,
-            error: "Límite de envío de correos alcanzado en Supabase (rate limit). Para solucionarlo de inmediato: en tu panel de Supabase ve a Authentication -> Providers -> Email y desactiva la opción 'Confirm email' (luego haz clic en Save). O inicia sesión directamente desde la pantalla de login con las cuentas demo."
+            error: "Límite de envíos alcanzado temporalmente. Por favor intenta de nuevo en unos minutos o inicia sesión si ya tienes cuenta."
           };
         }
         return { user: null, error: error.message };
@@ -213,7 +213,7 @@ export const authService = {
 
       return {
         user: null,
-        error: 'Credenciales inválidas en modo local. Usa una de las cuentas de prueba disponibles.'
+        error: 'Credenciales inválidas. Por favor verifica tu correo y contraseña.'
       };
     }
 
@@ -227,7 +227,7 @@ export const authService = {
         if (error.message.toLowerCase().includes('email not confirmed')) {
           return {
             user: null,
-            error: "El correo aún no ha sido confirmado. En tu panel de Supabase ve a Authentication -> Providers -> Email y desactiva 'Confirm email' para permitir login inmediato sin confirmación."
+            error: "El correo aún no ha sido confirmado. Por favor revisa tu bandeja de entrada o intenta más tarde."
           };
         }
         return { user: null, error: error.message };
@@ -263,7 +263,7 @@ export const authService = {
 
       return { user: null, error: 'No se pudo iniciar sesión.' };
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al conectar con Supabase';
+      const message = err instanceof Error ? err.message : 'Error al iniciar sesión';
       return { user: null, error: message };
     }
   },
